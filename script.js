@@ -65,9 +65,9 @@ function updateBoard(inputWord, result) {
   currentCell = 0;
 }
 
-// Función para manejar entrada del teclado
-async function handleKeyPress(event) {
-  const key = event.key.toUpperCase();
+// Manejar entrada del teclado
+async function handleKeyPress(key) {
+  key = key.toUpperCase();
 
   // Validar entrada válida
   if (!/^[A-ZÑ]$/.test(key) && key !== "BACKSPACE" && key !== "ENTER") return;
@@ -103,10 +103,10 @@ async function handleKeyPress(event) {
 
     if (inputWord === secretWord) {
       statusMessage.textContent = "¡Felicidades! Adivinaste la palabra.";
-      document.removeEventListener("keydown", handleKeyPress); // Bloquear más entradas
+      disableInput(); // Bloquear más entradas
     } else if (currentRow >= 6) {
       statusMessage.textContent = `¡Perdiste! La palabra era: ${secretWord}`;
-      document.removeEventListener("keydown", handleKeyPress); // Bloquear más entradas
+      disableInput(); // Bloquear más entradas
     }
     return;
   }
@@ -118,9 +118,35 @@ async function handleKeyPress(event) {
   }
 }
 
-// Restablecer el teclado si se deshabilita
-document.removeEventListener("keydown", handleKeyPress);
-document.addEventListener("keydown", handleKeyPress);
+// Deshabilitar entrada del teclado
+function disableInput() {
+  document.removeEventListener("keydown", keyboardInput);
+}
+
+// Manejar entradas del teclado físico
+function keyboardInput(event) {
+  handleKeyPress(event.key);
+}
+
+// Manejar clics en el teclado virtual
+const keys = document.querySelectorAll(".key");
+keys.forEach((key) => {
+  key.addEventListener("click", () => {
+    const keyValue = key.textContent.toUpperCase();
+
+    if (keyValue === "⌫") {
+      handleKeyPress("BACKSPACE");
+    } else if (keyValue === "ENTER") {
+      handleKeyPress("ENTER");
+    } else {
+      handleKeyPress(keyValue);
+    }
+  });
+});
+
+// Restablecer el teclado físico
+document.removeEventListener("keydown", keyboardInput);
+document.addEventListener("keydown", keyboardInput);
 
 // Obtener la palabra inicial
 fetchWord();
