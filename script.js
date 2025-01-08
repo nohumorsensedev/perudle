@@ -1,3 +1,4 @@
+// Variables para controlar el estado del juego
 let secretWord = '';
 let currentRow = 0;
 let currentCell = 0;
@@ -32,56 +33,61 @@ function createBoard(length) {
   }
 }
 
-// Validar palabra
+// Validar si la palabra existe en la base de datos
 async function isWordValid(word) {
   const response = await fetch(`/validate/${word}`);
   const data = await response.json();
   return data.exists;
 }
 
+// Validar la palabra ingresada
 function validateWord(inputWord) {
   const result = [];
   const secretLetters = secretWord.split('');
   const usedPositions = Array(secretWord.length).fill(false);
 
+  // Paso 1: Verificar letras correctas
   for (let i = 0; i < inputWord.length; i++) {
     if (inputWord[i] === secretWord[i]) {
-      result[i] = "correct";
+      result[i] = "correct"; // Letra en posición correcta
       usedPositions[i] = true;
       secretLetters[i] = null;
     }
   }
 
+  // Paso 2: Verificar letras presentes pero en posición incorrecta
   for (let i = 0; i < inputWord.length; i++) {
-    if (!result[i]) {
+    if (!result[i]) { // Solo si no está marcada como correcta
       const index = secretLetters.indexOf(inputWord[i]);
       if (index !== -1 && !usedPositions[index]) {
-        result[i] = "present";
+        result[i] = "present"; // Letra en posición incorrecta
         usedPositions[index] = true;
         secretLetters[index] = null;
       } else {
-        result[i] = "absent";
+        result[i] = "absent"; // Letra no existe
       }
     }
   }
   return result;
 }
 
-// Actualizar tablero
+// Actualizar el tablero
 function updateBoard(inputWord, result) {
   const row = board.children[currentRow];
   for (let i = 0; i < inputWord.length; i++) {
     const cell = row.children[i];
     cell.textContent = inputWord[i];
-    cell.classList.add(result[i]);
+    cell.classList.add(result[i]); // Añadir clase (correct, present, absent)
   }
   currentRow++;
   currentCell = 0;
 }
 
-// Entrada del teclado
+// Procesar entrada del teclado
 async function handleKeyPress(key) {
   key = key.toUpperCase();
+
+  // Validar entrada válida
   if (!/^[A-ZÑ]$/.test(key) && key !== "BACKSPACE" && key !== "ENTER") return;
 
   const row = board.children[currentRow];
@@ -101,21 +107,27 @@ async function handleKeyPress(key) {
       return;
     }
 
+    // Obtener palabra ingresada
     const inputWord = Array.from(row.children).map(cell => cell.textContent).join("");
-    const exists = await isWordValid(inputWord);
 
+    // Validar si la palabra existe
+    const exists = await isWordValid(inputWord);
     if (!exists) {
       statusMessage.textContent = "Palabra inexistente.";
       return;
     }
 
+    // Validar palabra
     const result = validateWord(inputWord);
     updateBoard(inputWord, result);
 
+    // Verificar si ganó
     if (inputWord === secretWord) {
       statusMessage.textContent = "¡Felicidades! Adivinaste la palabra.";
+      disableInput(); // Bloquear más entradas
     } else if (currentRow >= 6) {
       statusMessage.textContent = `¡Perdiste! La palabra era: ${secretWord}`;
+      disableInput(); // Bloquear más entradas
     }
     return;
   }
@@ -127,5 +139,35 @@ async function handleKeyPress(key) {
   }
 }
 
-document.addEventListener("keydown", (event) => handleKeyPress(event.key));
+// Deshabilitar teclado
+function disableInput() {
+  document.removeEventListener("keydown", keyboardInput);
+}
+
+// Manejar teclado físico
+function keyboardInput(event) {
+  handleKeyPress(event.key);
+}
+
+// Manejar teclado virtual
+const keys = document.querySelectorAll(".key");
+keys.forEach((key) => {
+  key.addEventListener("click", () => {
+    const keyValue = key.textContent.toUpperCase();
+
+    if (keyValue === "⌫") {
+      handleKeyPress("BACKSPACE");
+    } else if (keyValue === "ENTER") {
+      handleKeyPress("ENTER");
+    } else {
+      handleKeyPress(keyValue);
+    }
+  });
+});
+
+// Activar teclados
+document.removeEventListener("keydown", keyboardInput);
+document.addEventListener("keydown", keyboardInput);
+
+// Obtener palabra inicial
 fetchWord();
