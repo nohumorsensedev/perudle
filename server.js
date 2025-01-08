@@ -1,28 +1,45 @@
 const express = require('express');
-const db = require('./database'); // Conexión a la base de datos
-const path = require('path'); // Para manejar rutas
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+
 const app = express();
-const PORT = 3000;
+const port = process.env.PORT || 3000;
 
-// Servir archivos estáticos desde la carpeta actual
-app.use(express.static(__dirname));
+// Base de datos SQLite
+const db = new sqlite3.Database('words.db');
 
-// Ruta principal para cargar el juego
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+// Servir archivos estáticos
+app.use(express.static(path.join(__dirname)));
+
+// Endpoint para obtener una palabra aleatoria
+app.get('/word', (req, res) => {
+  db.get('SELECT word FROM words ORDER BY RANDOM() LIMIT 1', (err, row) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error al obtener la palabra.');
+    } else {
+      res.json({ word: row.word });
+    }
+  });
 });
 
-// Ruta para obtener una palabra aleatoria
-app.get('/word', (req, res) => {
-  db.get(`SELECT word FROM words ORDER BY RANDOM() LIMIT 1`, [], (err, row) => {
+// Endpoint para verificar si la palabra existe
+app.get('/validate/:word', (req, res) => {
+  const inputWord = req.params.word.toUpperCase();
+
+  db.get('SELECT word FROM words WHERE word = ?', [inputWord], (err, row) => {
     if (err) {
-      return res.status(500).send('Error al obtener la palabra');
+      console.error(err);
+      res.status(500).send('Error al validar la palabra.');
+    } else if (row) {
+      res.json({ exists: true });
+    } else {
+      res.json({ exists: false });
     }
-    res.json({ word: row.word });
   });
 });
 
 // Iniciar el servidor
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`Servidor corriendo en http://localhost:${port}`);
 });
