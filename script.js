@@ -1,4 +1,3 @@
-// Variables para controlar el estado del juego
 let secretWord = '';
 let currentRow = 0;
 let currentCell = 0;
@@ -13,22 +12,38 @@ async function fetchWord() {
   const data = await response.json();
   secretWord = data.word.toUpperCase();
   console.log(secretWord); // Para depurar
+
+  // Crear tablero dinámico según longitud de la palabra
+  createBoard(secretWord.length);
 }
 
-// Validar si la palabra existe en la base de datos
+// Crear tablero dinámico
+function createBoard(length) {
+  board.innerHTML = ''; // Limpiar el tablero
+  for (let i = 0; i < 6; i++) {
+    const row = document.createElement("div");
+    row.classList.add("row");
+    for (let j = 0; j < length; j++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      row.appendChild(cell);
+    }
+    board.appendChild(row);
+  }
+}
+
+// Validar palabra
 async function isWordValid(word) {
   const response = await fetch(`/validate/${word}`);
   const data = await response.json();
   return data.exists;
 }
 
-// Validar la palabra ingresada
 function validateWord(inputWord) {
   const result = [];
   const secretLetters = secretWord.split('');
   const usedPositions = Array(secretWord.length).fill(false);
 
-  // Paso 1: Verificar letras correctas
   for (let i = 0; i < inputWord.length; i++) {
     if (inputWord[i] === secretWord[i]) {
       result[i] = "correct";
@@ -37,7 +52,6 @@ function validateWord(inputWord) {
     }
   }
 
-  // Paso 2: Verificar letras en posición incorrecta
   for (let i = 0; i < inputWord.length; i++) {
     if (!result[i]) {
       const index = secretLetters.indexOf(inputWord[i]);
@@ -53,7 +67,7 @@ function validateWord(inputWord) {
   return result;
 }
 
-// Actualizar el tablero
+// Actualizar tablero
 function updateBoard(inputWord, result) {
   const row = board.children[currentRow];
   for (let i = 0; i < inputWord.length; i++) {
@@ -65,11 +79,9 @@ function updateBoard(inputWord, result) {
   currentCell = 0;
 }
 
-// Manejar entrada del teclado
+// Entrada del teclado
 async function handleKeyPress(key) {
   key = key.toUpperCase();
-
-  // Validar entrada válida
   if (!/^[A-ZÑ]$/.test(key) && key !== "BACKSPACE" && key !== "ENTER") return;
 
   const row = board.children[currentRow];
@@ -84,15 +96,14 @@ async function handleKeyPress(key) {
   }
 
   if (key === "ENTER") {
-    if (currentCell < 5) {
-      statusMessage.textContent = "La palabra debe tener 5 letras.";
+    if (currentCell < secretWord.length) {
+      statusMessage.textContent = `La palabra debe tener ${secretWord.length} letras.`;
       return;
     }
 
     const inputWord = Array.from(row.children).map(cell => cell.textContent).join("");
-
-    // **Validar si la palabra existe**
     const exists = await isWordValid(inputWord);
+
     if (!exists) {
       statusMessage.textContent = "Palabra inexistente.";
       return;
@@ -103,50 +114,18 @@ async function handleKeyPress(key) {
 
     if (inputWord === secretWord) {
       statusMessage.textContent = "¡Felicidades! Adivinaste la palabra.";
-      disableInput(); // Bloquear más entradas
     } else if (currentRow >= 6) {
       statusMessage.textContent = `¡Perdiste! La palabra era: ${secretWord}`;
-      disableInput(); // Bloquear más entradas
     }
     return;
   }
 
-  if (currentCell < 5) {
+  if (currentCell < secretWord.length) {
     const cell = row.children[currentCell];
     cell.textContent = key;
     currentCell++;
   }
 }
 
-// Deshabilitar entrada del teclado
-function disableInput() {
-  document.removeEventListener("keydown", keyboardInput);
-}
-
-// Manejar entradas del teclado físico
-function keyboardInput(event) {
-  handleKeyPress(event.key);
-}
-
-// Manejar clics en el teclado virtual
-const keys = document.querySelectorAll(".key");
-keys.forEach((key) => {
-  key.addEventListener("click", () => {
-    const keyValue = key.textContent.toUpperCase();
-
-    if (keyValue === "⌫") {
-      handleKeyPress("BACKSPACE");
-    } else if (keyValue === "ENTER") {
-      handleKeyPress("ENTER");
-    } else {
-      handleKeyPress(keyValue);
-    }
-  });
-});
-
-// Restablecer el teclado físico
-document.removeEventListener("keydown", keyboardInput);
-document.addEventListener("keydown", keyboardInput);
-
-// Obtener la palabra inicial
+document.addEventListener("keydown", (event) => handleKeyPress(event.key));
 fetchWord();

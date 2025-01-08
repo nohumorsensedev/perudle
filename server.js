@@ -11,9 +11,10 @@ const db = new sqlite3.Database('words.db');
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname)));
 
-// Endpoint para obtener una palabra aleatoria
+// Obtener una palabra aleatoria de 5 o 6 letras
 app.get('/word', (req, res) => {
-  db.get('SELECT word FROM words ORDER BY RANDOM() LIMIT 1', (err, row) => {
+  const length = Math.random() < 0.5 ? 5 : 6; // Seleccionar aleatoriamente 5 o 6 letras
+  db.get(`SELECT word FROM words WHERE LENGTH(word) = ? ORDER BY RANDOM() LIMIT 1`, [length], (err, row) => {
     if (err) {
       console.error(err);
       res.status(500).send('Error al obtener la palabra.');
@@ -23,7 +24,7 @@ app.get('/word', (req, res) => {
   });
 });
 
-// Endpoint para verificar si la palabra existe
+// Validar si la palabra existe
 app.get('/validate/:word', (req, res) => {
   const inputWord = req.params.word.toUpperCase();
 
