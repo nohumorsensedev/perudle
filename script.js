@@ -65,10 +65,11 @@ function updateBoard(inputWord, result) {
   currentCell = 0;
 }
 
-// Manejar entrada del teclado
-document.addEventListener("keydown", async (event) => {
+// Función para manejar entrada del teclado
+async function handleKeyPress(event) {
   const key = event.key.toUpperCase();
 
+  // Validar entrada válida
   if (!/^[A-ZÑ]$/.test(key) && key !== "BACKSPACE" && key !== "ENTER") return;
 
   const row = board.children[currentRow];
@@ -90,7 +91,7 @@ document.addEventListener("keydown", async (event) => {
 
     const inputWord = Array.from(row.children).map(cell => cell.textContent).join("");
 
-    // **Nueva validación: Verificar si la palabra existe**
+    // **Validar si la palabra existe**
     const exists = await isWordValid(inputWord);
     if (!exists) {
       statusMessage.textContent = "Palabra inexistente.";
@@ -102,10 +103,10 @@ document.addEventListener("keydown", async (event) => {
 
     if (inputWord === secretWord) {
       statusMessage.textContent = "¡Felicidades! Adivinaste la palabra.";
-      document.removeEventListener("keydown", arguments.callee);
+      document.removeEventListener("keydown", handleKeyPress); // Bloquear más entradas
     } else if (currentRow >= 6) {
       statusMessage.textContent = `¡Perdiste! La palabra era: ${secretWord}`;
-      document.removeEventListener("keydown", arguments.callee);
+      document.removeEventListener("keydown", handleKeyPress); // Bloquear más entradas
     }
     return;
   }
@@ -115,7 +116,11 @@ document.addEventListener("keydown", async (event) => {
     cell.textContent = key;
     currentCell++;
   }
-});
+}
+
+// Restablecer el teclado si se deshabilita
+document.removeEventListener("keydown", handleKeyPress);
+document.addEventListener("keydown", handleKeyPress);
 
 // Obtener la palabra inicial
 fetchWord();
