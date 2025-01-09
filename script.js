@@ -1,7 +1,7 @@
-// Variables para controlar el estado del juego
-let secretWord = ''; // La palabra secreta
-let currentRow = 0;  // Fila actual
-let currentCell = 0; // Celda actual
+// Variables para el juego
+let secretWord = '';
+let currentRow = 0;
+let currentCell = 0;
 
 // Elementos del DOM
 const board = document.getElementById("board");
@@ -9,24 +9,22 @@ const statusMessage = document.getElementById("status-message");
 
 // Obtener palabra secreta del servidor
 async function fetchWord() {
-  const response = await fetch('/word'); // Llama al servidor
-  const data = await response.json();   // Recibe la palabra
-  secretWord = data.word.toUpperCase(); // Guarda la palabra en mayúsculas
-  console.log(secretWord);              // Para depuración
+  const response = await fetch('/word'); // Obtener palabra desde el servidor
+  const data = await response.json();
+  secretWord = data.word.toUpperCase(); // Convertir en mayúsculas
+  console.log(secretWord); // Para depuración
 
-  // Crear tablero dinámico según longitud de la palabra
-  createBoard(secretWord.length);
+  createBoard(secretWord.length); // Crear el tablero dinámico
 }
 
-// Crear tablero dinámico (5 o 6 letras)
+// Crear tablero dinámico según longitud de la palabra
 function createBoard(length) {
-  board.innerHTML = ''; // Limpia el tablero
+  board.innerHTML = ''; // Limpiar tablero
 
-  // Crear 6 filas dinámicas
   for (let i = 0; i < 6; i++) {
     const row = document.createElement("div");
     row.classList.add("row");
-    for (let j = 0; j < length; j++) { // Ajustar según longitud
+    for (let j = 0; j < length; j++) {
       const cell = document.createElement("div");
       cell.classList.add("cell");
       row.appendChild(cell);
@@ -35,20 +33,20 @@ function createBoard(length) {
   }
 }
 
-// Validar si la palabra existe en la base de datos
+// Validar si la palabra existe
 async function isWordValid(word) {
   const response = await fetch(`/validate/${word}`);
   const data = await response.json();
   return data.exists; // Devuelve true o false
 }
 
-// Validar palabra y asignar colores
+// Validar letras en la palabra
 function validateWord(inputWord) {
   const result = [];
   const secretLetters = secretWord.split('');
   const usedPositions = Array(secretWord.length).fill(false);
 
-  // Verificar letras correctas (verde)
+  // Comprobar letras en posición correcta (verde)
   for (let i = 0; i < inputWord.length; i++) {
     if (inputWord[i] === secretWord[i]) {
       result[i] = "correct";
@@ -57,7 +55,7 @@ function validateWord(inputWord) {
     }
   }
 
-  // Verificar letras presentes pero en posición incorrecta (amarillo)
+  // Comprobar letras presentes pero en posición incorrecta (amarillo)
   for (let i = 0; i < inputWord.length; i++) {
     if (!result[i]) {
       const index = secretLetters.indexOf(inputWord[i]);
@@ -75,20 +73,20 @@ function validateWord(inputWord) {
 
 // Actualizar tablero con colores
 function updateBoard(inputWord, result) {
-  const row = board.children[currentRow]; // Seleccionar fila actual
+  const row = board.children[currentRow];
 
   for (let i = 0; i < inputWord.length; i++) {
     const cell = row.children[i];
-    cell.textContent = inputWord[i]; // Mostrar la letra
+    cell.textContent = inputWord[i]; // Mostrar letra
     cell.classList.remove("correct", "present", "absent");
-    cell.classList.add(result[i]); // Añadir color
+    cell.classList.add(result[i]); // Aplicar color
   }
 
-  currentRow++; // Pasar a la siguiente fila
-  currentCell = 0; // Reiniciar celda
+  currentRow++;
+  currentCell = 0;
 }
 
-// Manejar el teclado
+// Manejar entradas del teclado
 async function handleKeyPress(key) {
   key = key.toUpperCase();
 
@@ -97,6 +95,7 @@ async function handleKeyPress(key) {
 
   const row = board.children[currentRow];
 
+  // Borrar letra
   if (key === "BACKSPACE") {
     if (currentCell > 0) {
       currentCell--;
@@ -106,6 +105,7 @@ async function handleKeyPress(key) {
     return;
   }
 
+  // Confirmar palabra
   if (key === "ENTER") {
     if (currentCell < secretWord.length) {
       statusMessage.textContent = `La palabra debe tener ${secretWord.length} letras.`;
@@ -124,22 +124,30 @@ async function handleKeyPress(key) {
       return;
     }
 
+    // Validar letras
     const result = validateWord(inputWord);
     updateBoard(inputWord, result);
 
+    // Verificar si ganó
     if (inputWord === secretWord) {
       statusMessage.textContent = "🎉 ¡Correcto! Adivinaste la palabra.";
       disableInput();
-    } else if (currentRow >= 6) {
+      return;
+    }
+
+    // Verificar si perdió
+    if (currentRow >= 6) {
       statusMessage.textContent = `😢 ¡Perdiste! La palabra era: ${secretWord}`;
       disableInput();
-    } else {
-      statusMessage.textContent = "⏳ Sigue intentando.";
+      return;
     }
+
+    // Seguir intentando
+    statusMessage.textContent = "⏳ Sigue intentando.";
     return;
   }
 
-  // Insertar letras
+  // Escribir letra en celda
   if (currentCell < secretWord.length) {
     const cell = row.children[currentCell];
     cell.textContent = key;
@@ -147,7 +155,7 @@ async function handleKeyPress(key) {
   }
 }
 
-// Deshabilitar teclado
+// Desactivar teclado después de ganar o perder
 function disableInput() {
   document.removeEventListener("keydown", keyboardInput);
 }
