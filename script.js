@@ -1,30 +1,32 @@
 // Variables para controlar el estado del juego
-let secretWord = '';
-let currentRow = 0;
-let currentCell = 0;
+let secretWord = ''; // La palabra secreta
+let currentRow = 0;  // Fila actual
+let currentCell = 0; // Celda actual
 
 // Elementos del DOM
 const board = document.getElementById("board");
 const statusMessage = document.getElementById("status-message");
 
-// Obtener la palabra secreta
+// Obtener palabra secreta del servidor
 async function fetchWord() {
-  const response = await fetch('/word');
-  const data = await response.json();
-  secretWord = data.word.toUpperCase();
-  console.log(secretWord); // Para depurar
+  const response = await fetch('/word'); // Llama al servidor
+  const data = await response.json();   // Recibe la palabra
+  secretWord = data.word.toUpperCase(); // Guarda la palabra en mayúsculas
+  console.log(secretWord);              // Para depuración
 
   // Crear tablero dinámico según longitud de la palabra
   createBoard(secretWord.length);
 }
 
-// Crear tablero dinámico
+// Crear tablero dinámico (5 o 6 letras)
 function createBoard(length) {
-  board.innerHTML = ''; // Limpiar el tablero
+  board.innerHTML = ''; // Limpia el tablero
+
+  // Crear 6 filas dinámicas
   for (let i = 0; i < 6; i++) {
     const row = document.createElement("div");
     row.classList.add("row");
-    for (let j = 0; j < length; j++) {
+    for (let j = 0; j < length; j++) { // Ajustar según longitud
       const cell = document.createElement("div");
       cell.classList.add("cell");
       row.appendChild(cell);
@@ -37,53 +39,56 @@ function createBoard(length) {
 async function isWordValid(word) {
   const response = await fetch(`/validate/${word}`);
   const data = await response.json();
-  return data.exists;
+  return data.exists; // Devuelve true o false
 }
 
-// Validar la palabra ingresada
+// Validar palabra y asignar colores
 function validateWord(inputWord) {
   const result = [];
   const secretLetters = secretWord.split('');
   const usedPositions = Array(secretWord.length).fill(false);
 
-  // Paso 1: Verificar letras correctas
+  // Verificar letras correctas (verde)
   for (let i = 0; i < inputWord.length; i++) {
     if (inputWord[i] === secretWord[i]) {
-      result[i] = "correct"; // Letra en posición correcta
+      result[i] = "correct";
       usedPositions[i] = true;
       secretLetters[i] = null;
     }
   }
 
-  // Paso 2: Verificar letras presentes pero en posición incorrecta
+  // Verificar letras presentes pero en posición incorrecta (amarillo)
   for (let i = 0; i < inputWord.length; i++) {
-    if (!result[i]) { // Solo si no está marcada como correcta
+    if (!result[i]) {
       const index = secretLetters.indexOf(inputWord[i]);
       if (index !== -1 && !usedPositions[index]) {
-        result[i] = "present"; // Letra en posición incorrecta
+        result[i] = "present";
         usedPositions[index] = true;
         secretLetters[index] = null;
       } else {
-        result[i] = "absent"; // Letra no existe
+        result[i] = "absent"; // Letra no está en la palabra
       }
     }
   }
   return result;
 }
 
-// Actualizar el tablero
+// Actualizar tablero con colores
 function updateBoard(inputWord, result) {
-  const row = board.children[currentRow];
+  const row = board.children[currentRow]; // Seleccionar fila actual
+
   for (let i = 0; i < inputWord.length; i++) {
     const cell = row.children[i];
-    cell.textContent = inputWord[i];
-    cell.classList.add(result[i]); // Añadir clase (correct, present, absent)
+    cell.textContent = inputWord[i]; // Mostrar la letra
+    cell.classList.remove("correct", "present", "absent");
+    cell.classList.add(result[i]); // Añadir color
   }
-  currentRow++;
-  currentCell = 0;
+
+  currentRow++; // Pasar a la siguiente fila
+  currentCell = 0; // Reiniciar celda
 }
 
-// Procesar entrada del teclado
+// Manejar el teclado
 async function handleKeyPress(key) {
   key = key.toUpperCase();
 
@@ -108,30 +113,33 @@ async function handleKeyPress(key) {
     }
 
     // Obtener palabra ingresada
-    const inputWord = Array.from(row.children).map(cell => cell.textContent).join("");
+    const inputWord = Array.from(row.children)
+      .map((cell) => cell.textContent)
+      .join("");
 
-    // Validar si la palabra existe
+    // Validar si existe
     const exists = await isWordValid(inputWord);
     if (!exists) {
-      statusMessage.textContent = "Palabra inexistente.";
+      statusMessage.textContent = "❌ Esa palabra no existe.";
       return;
     }
 
-    // Validar palabra
     const result = validateWord(inputWord);
     updateBoard(inputWord, result);
 
-    // Verificar si ganó
     if (inputWord === secretWord) {
-      statusMessage.textContent = "¡Felicidades! Adivinaste la palabra.";
-      disableInput(); // Bloquear más entradas
+      statusMessage.textContent = "🎉 ¡Correcto! Adivinaste la palabra.";
+      disableInput();
     } else if (currentRow >= 6) {
-      statusMessage.textContent = `¡Perdiste! La palabra era: ${secretWord}`;
-      disableInput(); // Bloquear más entradas
+      statusMessage.textContent = `😢 ¡Perdiste! La palabra era: ${secretWord}`;
+      disableInput();
+    } else {
+      statusMessage.textContent = "⏳ Sigue intentando.";
     }
     return;
   }
 
+  // Insertar letras
   if (currentCell < secretWord.length) {
     const cell = row.children[currentCell];
     cell.textContent = key;
@@ -144,24 +152,19 @@ function disableInput() {
   document.removeEventListener("keydown", keyboardInput);
 }
 
-// Manejar teclado físico
+// Teclado físico
 function keyboardInput(event) {
   handleKeyPress(event.key);
 }
 
-// Manejar teclado virtual
+// Teclado virtual
 const keys = document.querySelectorAll(".key");
 keys.forEach((key) => {
   key.addEventListener("click", () => {
     const keyValue = key.textContent.toUpperCase();
-
-    if (keyValue === "⌫") {
-      handleKeyPress("BACKSPACE");
-    } else if (keyValue === "ENTER") {
-      handleKeyPress("ENTER");
-    } else {
-      handleKeyPress(keyValue);
-    }
+    if (keyValue === "⌫") handleKeyPress("BACKSPACE");
+    else if (keyValue === "ENTER") handleKeyPress("ENTER");
+    else handleKeyPress(keyValue);
   });
 });
 
@@ -169,5 +172,5 @@ keys.forEach((key) => {
 document.removeEventListener("keydown", keyboardInput);
 document.addEventListener("keydown", keyboardInput);
 
-// Obtener palabra inicial
+// Obtener la palabra inicial
 fetchWord();
