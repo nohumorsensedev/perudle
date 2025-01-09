@@ -69,14 +69,22 @@ body {
     color: white;
   }
   
-  /* Teclado virtual */
-  .keyboard {
+ /* Teclado virtual */
+.keyboard {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     margin-top: 20px;
   }
   
+  /* Filas del teclado */
+  .keyboard-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+  }
+  
+  /* Teclas */
   .key {
     width: 40px;
     height: 40px;
@@ -92,42 +100,27 @@ body {
     border: 1px solid #555;
   }
   
-  .key:hover {
-    background-color: #555;
-  }
-  
-  /* Espacio adicional para letras largas */
+  /* Teclas más anchas (ENTER y BACKSPACE) */
   .key.wide {
     width: 60px;
   }
   
-  /* Mensaje final */
-  .end-message {
-    margin-top: 20px;
-    font-size: 1.2em;
-    font-weight: bold;
-    text-align: center;
-    color: white;
+  /* Cambia el color al pasar el ratón */
+  .key:hover {
+    background-color: #555;
   }
   
-  /* Animaciones */
-  .correct,
-  .present,
-  .absent {
-    transition: all 0.3s ease;
+  /* Teclas pulsadas */
+  .key.pressed {
+    background-color: #777;
   }
   
-  /* Responsive */
+  /* Responsive para pantallas pequeñas */
   @media (max-width: 600px) {
-    .cell {
-      width: 40px;
-      height: 40px;
-      font-size: 1.2em;
-    }
-  
     .key {
       width: 35px;
       height: 35px;
+      font-size: 0.9em;
     }
   
     .key.wide {
