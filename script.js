@@ -137,7 +137,7 @@ async function handleKeyPress(key) {
 
     // Verificar si perdió
     if (currentRow >= 6) {
-      statusMessage.textContent = `😢 ¡Perdiste! La palabra era: ${secretWord}`;
+      statusMessage.textContent = `¡Perdiste! La palabra era: ${secretWord}`;
       disableInput();
       return;
     }
