@@ -130,3 +130,17 @@ body {
     }
   }
   
+  #footer-message {
+    text-align: center;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #222222;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+#footer-message p {
+    margin: 0;
+}
