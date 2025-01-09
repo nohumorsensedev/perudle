@@ -1,111 +1,137 @@
+/* General */
 body {
     font-family: Arial, sans-serif;
-    background-color: #121213;
-    color: #ffffff;
+    background-color: #121212; /* Fondo oscuro */
+    color: white;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     height: 100vh;
-    margin: 0;
   }
   
-  #game-container {
+  /* Título */
+  h1 {
+    margin-top: 20px;
+    font-size: 2em;
     text-align: center;
-    width: 90%;
-    max-width: 400px;
   }
   
+  /* Tablero */
   #board {
-    display: grid;
-    grid-template-rows: repeat(6, 1fr);
-    grid-gap: 10px;
-    margin: 20px 0;
-  }
-  
-  .row {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 5px;
-  }
-  
-  .cell {
-    width: 50px;
-    height: 50px;
-    background-color: #3a3a3c;
-    color: white;
-    font-size: 1.5rem;
-    text-align: center;
-    line-height: 50px;
-    border-radius: 5px;
-    border: 2px solid #3a3a3c;
-  }
-  
-  .cell.correct {
-    background-color: #538d4e;
-  }
-  
-  .cell.present {
-    background-color: #b59f3b;
-  }
-  
-  .cell.absent {
-    background-color: #3a3a3c;
-    opacity: 0.5;
-  }
-  
-  #input-area {
-    margin-top: 20px;
-  }
-  
-  #word-input {
-    padding: 10px;
-    font-size: 1rem;
-    width: 60%;
-    margin-right: 10px;
-  }
-  
-  #submit-button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    cursor: pointer;
-    background-color: #538d4e;
-    color: white;
-    border: none;
-    border-radius: 5px;
-  }
-/* Estilos para el teclado */
-#keyboard {
-    margin-top: 20px;
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Aumenta el espacio entre filas */
+    align-items: center;
+    margin-top: 20px;
   }
   
-  .keyboard-row {
+  /* Filas */
+  .row {
+    display: flex; /* Poner las celdas en fila */
+    justify-content: center; /* Centrar horizontalmente */
+    margin-bottom: 10px; /* Espacio entre filas */
+  }
+  
+  /* Celdas */
+  .cell {
+    width: 50px; /* Tamaño del cuadro */
+    height: 50px; /* Tamaño del cuadro */
+    margin: 5px; /* Espacio entre cuadros */
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 10px; /* Aumenta el espacio entre teclas */
+    font-size: 1.5em; /* Tamaño de letra */
+    font-weight: bold;
+    border: 2px solid gray; /* Borde */
+    color: white;
+  }
+  
+  /* Colores para el estado de las letras */
+  .correct {
+    background-color: green; /* Letra correcta en posición correcta */
+  }
+  
+  .present {
+    background-color: orange; /* Letra en palabra pero en posición incorrecta */
+  }
+  
+  .absent {
+    background-color: gray; /* Letra no está en la palabra */
+  }
+  
+  /* Mensajes */
+  #status-message {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+  }
+  
+  /* Teclado virtual */
+  .keyboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
   }
   
   .key {
-    padding: 15px; /* Aumenta el tamaño del área clicable */
-    font-size: 1.2rem; /* Letra más grande */
-    font-weight: bold;
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+    border-radius: 5px;
+    background-color: #333;
     color: white;
-    background-color: #3a3a3c;
-    border: none;
-    border-radius: 8px; /* Esquinas ligeramente más redondeadas */
     cursor: pointer;
-    width: 50px; /* Teclas más anchas */
-    height: 60px; /* Teclas más altas */
-    text-align: center;
+    border: 1px solid #555;
   }
   
   .key:hover {
-    background-color: #538d4e;
+    background-color: #555;
   }
   
-  .wide-key {
-    width: 100px; /* Teclas especiales más anchas */
+  /* Espacio adicional para letras largas */
+  .key.wide {
+    width: 60px;
   }
+  
+  /* Mensaje final */
+  .end-message {
+    margin-top: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+  }
+  
+  /* Animaciones */
+  .correct,
+  .present,
+  .absent {
+    transition: all 0.3s ease;
+  }
+  
+  /* Responsive */
+  @media (max-width: 600px) {
+    .cell {
+      width: 40px;
+      height: 40px;
+      font-size: 1.2em;
+    }
+  
+    .key {
+      width: 35px;
+      height: 35px;
+    }
+  
+    .key.wide {
+      width: 50px;
+    }
+  }
+  
