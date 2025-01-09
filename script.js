@@ -182,3 +182,5 @@ document.addEventListener("keydown", keyboardInput);
 
 // Obtener la palabra inicial
 fetchWord();
+
+statusMessage.textContent = "¡Esto es una prueba!"; // Solo para probar
