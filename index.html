@@ -2,85 +2,100 @@
 <html lang="es">
 <head>
     <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-PDLCCMR7');</script>
+    <script>
+        (function(w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-PDLCCMR7');
+    </script>
     <!-- End Google Tag Manager -->
 
     <link rel="icon" href="icon.ico" type="image/x-icon">
 
     <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Perudle - El Wordle Peruano</title>
-<meta name="description" content="Descubre Perudle, el juego de palabras peruano. ¡Adivina palabras y desafía tu vocabulario!">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perudle - El Wordle Peruano</title>
+    <meta name="description" content="Descubre Perudle, el juego de palabras peruano. ¡Adivina palabras y desafía tu vocabulario!">
 
-  <link rel="stylesheet" href="styles.css" />
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4200093874998814"
-  crossorigin="anonymous"></script>
+    <!-- Estilos CSS -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- Anuncios -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4200093874998814"
+        crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PDLCCMR7"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PDLCCMR7" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-  <h1>🇵🇪 Perudle 🇵🇪</h1>
-  
-  <!-- Tablero -->
-  <div id="board"></div>
+    <header>
+        <h1 aria-label="Perudle: El Wordle Peruano">🇵🇪 Perudle 🇵🇪</h1>
+    </header>
 
-  <!-- Mensaje de estado -->
-  <div id="status-message"></div>
+    <!-- Tablero -->
+    <main>
+        <section id="game-board">
+            <div id="board" role="grid" aria-label="Tablero de juego"></div>
+        </section>
 
-  <!-- Teclado -->
-  <div class="keyboard">
-    <div class="keyboard-row">
-      <div class="key">Q</div>
-      <div class="key">W</div>
-      <div class="key">E</div>
-      <div class="key">R</div>
-      <div class="key">T</div>
-      <div class="key">Y</div>
-      <div class="key">U</div>
-      <div class="key">I</div>
-      <div class="key">O</div>
-      <div class="key">P</div>
-    </div>
-    <div class="keyboard-row">
-      <div class="key">A</div>
-      <div class="key">S</div>
-      <div class="key">D</div>
-      <div class="key">F</div>
-      <div class="key">G</div>
-      <div class="key">H</div>
-      <div class="key">J</div>
-      <div class="key">K</div>
-      <div class="key">L</div>
-      <div class="key">Ñ</div>
-    </div>
-    <div class="keyboard-row">
-      
-      <div class="key">Z</div>
-      <div class="key">X</div>
-      <div class="key">C</div>
-      <div class="key">V</div>
-      <div class="key">B</div>
-      <div class="key">N</div>
-      <div class="key">M</div>
-    </div>
-    <div class="keyboard-row">
-      <div class="key wide">ENTER</div>
-      <div class="key wide">⌫</div>
-    </div>
-  </div>
+        <!-- Mensaje de estado -->
+        <div id="status-message" role="status" aria-live="polite"></div>
 
-  <script src="script.js"></script>
+        <!-- Teclado -->
+        <section class="keyboard" aria-label="Teclado virtual">
+            <div class="keyboard-row">
+                <button class="key" aria-label="Q">Q</button>
+                <button class="key" aria-label="W">W</button>
+                <button class="key" aria-label="E">E</button>
+                <button class="key" aria-label="R">R</button>
+                <button class="key" aria-label="T">T</button>
+                <button class="key" aria-label="Y">Y</button>
+                <button class="key" aria-label="U">U</button>
+                <button class="key" aria-label="I">I</button>
+                <button class="key" aria-label="O">O</button>
+                <button class="key" aria-label="P">P</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key" aria-label="A">A</button>
+                <button class="key" aria-label="S">S</button>
+                <button class="key" aria-label="D">D</button>
+                <button class="key" aria-label="F">F</button>
+                <button class="key" aria-label="G">G</button>
+                <button class="key" aria-label="H">H</button>
+                <button class="key" aria-label="J">J</button>
+                <button class="key" aria-label="K">K</button>
+                <button class="key" aria-label="L">L</button>
+                <button class="key" aria-label="Ñ">Ñ</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key" aria-label="Z">Z</button>
+                <button class="key" aria-label="X">X</button>
+                <button class="key" aria-label="C">C</button>
+                <button class="key" aria-label="V">V</button>
+                <button class="key" aria-label="B">B</button>
+                <button class="key" aria-label="N">N</button>
+                <button class="key" aria-label="M">M</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key wide" aria-label="Enter">ENTER</button>
+                <button class="key wide" aria-label="Borrar">⌫</button>
+            </div>
+        </section>
+    </main>
 
-  <footer id="footer-message">
-    <p>Esta es la versión no terminada de PERUDLE, seguimos trabajando para resolver errores o agregar palabras.</p>
-</footer>
+    <!-- Scripts -->
+    <script src="script.js" defer></script>
 
+    <!-- Pie de página -->
+    <footer id="footer-message">
+        <p>Esta es la versión no terminada de PERUDLE, seguimos trabajando para resolver errores o agregar palabras.</p>
+    </footer>
 </body>
 </html>
